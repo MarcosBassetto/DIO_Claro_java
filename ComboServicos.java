@@ -27,6 +27,7 @@ class ComboServicos {
         this.desconto3 = descontos[2];
     }
 
+
     // Método para calcular o valor total do combo com descontos
     public double calcularValorTotal() {
         // Conta quantos serviços foram contratados (com valor maior que 0)
@@ -34,9 +35,23 @@ class ComboServicos {
                 .filter(servico -> servico.getValor() > 0)
                 .count();
 
-        double desconto;
+
         // TODO: Aplique o desconto correspondente à quantidade de serviços contratados
-        desconto = desconto1+desconto2+desconto3;
+        double desconto;
+        int servicosAtivos = 0;
+        for (Servico servico2 : servicos) {
+            if (servico2.getValor() > 0) {
+                servicosAtivos++;
+            } 
+        }
+        if (servicosAtivos == 1) {
+            desconto = desconto1;
+        } else if (servicosAtivos == 2) {
+            desconto = desconto2;
+        } else {
+            desconto = desconto3;
+        }
+
 
         // Calcula o valor total com desconto
         double valorComDesconto = Arrays.stream(servicos)
@@ -45,10 +60,43 @@ class ComboServicos {
                 .sum() * (1 - desconto / 100);
 
         // TODO: Aplique desconto adicional se todos os três serviços foram contratados
-        if( 0 < desconto1 && 0 < desconto2 && 0 < desconto3  ){
+        if( servicosAtivos == 3){
             valorComDesconto -= 20;
         }
 
         return valorComDesconto;
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        // Leitura da primeira linha de entrada
+        String[] entrada1 = scanner.nextLine().trim().split(",");
+        double[] valoresServicos = Arrays.stream(entrada1)
+                .mapToDouble(Double::parseDouble)
+                .toArray();
+
+        // Leitura da segunda linha de entrada
+        String[] entrada2 = scanner.nextLine().trim().split(",");
+        double[] descontos = Arrays.stream(entrada2)
+                .mapToDouble(Double::parseDouble)
+                .toArray();
+
+        // Criando objetos Servico
+        Servico[] servicos = new Servico[valoresServicos.length];
+        for (int i = 0; i < valoresServicos.length; i++) {
+            servicos[i] = new Servico(valoresServicos[i]);
+        }
+
+        // Criando o combo de serviços
+        ComboServicos combo = new ComboServicos(servicos, descontos);
+
+        // Calculando e imprimindo o valor total com desconto
+        double valorTotal = combo.calcularValorTotal();
+        System.out.printf("%.2f\n", valorTotal);
+
+        scanner.close();
     }
 }
